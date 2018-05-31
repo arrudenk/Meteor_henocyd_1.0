@@ -197,15 +197,24 @@ Space_Stage.prototype.game_over = function(){
 
 Space_Stage.prototype.player_collision = function ()
 {
-  for (var i = 0; i < this.meteors.length; i++){
-      if(this.circle_circle_collision(this.meteors[i], this.player))
-      {
-          this.menu.reload_texture.x = 0;
-          this.menu.reload_texture.y = 0;
-          app.ticker.stop();
-          console.log('player hit')
-      }
-  }
+    if (this.player.y < -300 || this.player.y > 300) {
+        this.player.y = Math.min(300, Math.max(-300, this.player.y));// check+++++
+        this.player.y *= -1;
+    }
+    if (this.player.x < -300 || this.player.x > 300) {
+        this.player.x = Math.min(300, Math.max(-300, this.player.x));// check+++++
+        this.player.x *= -1;
+    }
+
+    for (var i = 0; i < this.meteors.length; i++){
+       if(this.circle_circle_collision(this.meteors[i], this.player))
+       {
+           this.menu.reload_texture.x = 0;
+           this.menu.reload_texture.y = 0;
+           app.ticker.stop();
+           console.log('player hit')
+       }
+    }
 };
 
 Space_Stage.prototype.shoot = function(delta){
