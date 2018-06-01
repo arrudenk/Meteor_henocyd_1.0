@@ -8,7 +8,7 @@ function Player() {
     this.radius = 20;
     this.add_player();
     this.interactive = true;
-    this.on("pointermove", this.shoot, this);
+    this.on("pointermove", this.bullet_shoot, this);
     this.x_velocity = 0;
     this.y_velocity = 0;
 
@@ -32,9 +32,9 @@ Player.prototype.add_player = function () {
     this.addChild(this.rocket);
 };
 
-Player.prototype.shoot = function (e) {
+Player.prototype.bullet_shoot = function (e) {
     var loc = e.data.getLocalPosition(this);
     console.log(loc);
-    this.emit("create_bullets", loc);
+    this.emit("bullets_create", loc);
     this.emit("mouse loc", loc);
 };

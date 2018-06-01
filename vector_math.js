@@ -54,5 +54,36 @@ function vector_reflection(vec_A, vec_B) {
     return (reflection);//                         |DONE
 }
 
+function circle_circle_collision(circle_a, circle_b) {
+	var a_b = Math.pow(circle_a.x - circle_b.x, 2) + Math.pow(circle_a.y - circle_b.y, 2);
+	var a_rad_b_rad  = Math.pow(circle_a.radius + circle_b.radius, 2);
+	if (a_b <= a_rad_b_rad) {
+		return (true);
+	}
+	return (false)
+}
+
+function circle_rectangle_collision(circle, rectangle)
+{
+	var closestX = clamp(circle.x, rectangle.x, rectangle.x + rectangle.width);
+	var closestY = clamp(circle.y, rectangle.y, rectangle.y + rectangle.height);
+
+	var distanceX = circle.x - closestX;
+	var distanceY = circle.y - closestY;
+
+	var distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+	if (distanceSquared <= (circle.radius * circle.radius))
+		return (true);
+	return (false);
+};
+
+function find_angle(mx, my, px, py){
+	var dist_Y = my - py;
+	var dist_X = mx - px;
+	var angle = Math.atan2(dist_Y,dist_X);
+	//var degrees = angle * 180/ Math.PI;
+	return angle;
+}
+
 
 
