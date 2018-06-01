@@ -13,8 +13,11 @@ var KeyCod = {
 function Space_Stage() {
     PIXI.Container.call(this);
 
+    this.fps = 20;
+    this.mouse_loc = {};
+
     this.meteors = [];
-    this.meteors_col = 20;
+    this.meteors_col = 15;
     this.bullets = [];
     this.bulletspeed = 20;
     this.player = null;
@@ -31,7 +34,7 @@ function Space_Stage() {
         fontSize: 36,
         fontStyle: 'italic',
         fontWeight: 'bold',
-        fill: ['#ffffff', '#00ff99'], // gradient
+        fill: ['#ff81dc', '#1323ff'], // gradient
         stroke: '#4a1850',
         strokeThickness: 5,
         dropShadow: true,
@@ -56,6 +59,7 @@ Space_Stage.prototype.add_menu = function(){
     this.menu = new Menu();
 
     this.addChild(this.menu);
+    this.menu.ammo.position.set(-300, 250);
 
     this.menu.reload_texture.on('reload game', this.game_over, this)
 };
@@ -65,7 +69,12 @@ Space_Stage.prototype.add_player = function(){
 
     this.addChild(this.player);
 
-    this.player.on("create_bullets", this.create_bullets, this)
+    // this.player.on("create_bullets", this.create_bullets, this)
+    console.log(this.player.on("mouse loc", this.mouse, this));
+};
+
+Space_Stage.prototype.mouse = function(loc){
+  this.mouse_loc = loc;
 };
 
 Space_Stage.prototype.create_bullets = function(loc){
@@ -106,6 +115,22 @@ Space_Stage.prototype.circle_circle_collision = function(circle_1, circle_2) {
     return (false)
 };
 
+Space_Stage.prototype.normalize_position = function(a, b)
+{
+    var r1_r2 = Math.pow(a.radius + b.radius, 2);
+    var i_j = Math.pow(a.x - b.x, 2)
+        + Math.pow(a.y - b.y, 2);
+    var diff = r1_r2 - i_j;
+    var outof_J = v1_minus_v2(b, a);
+    var outof_I = v1_minus_v2(a, b);
+    outof_J = scalar_vector(-1, outof_J);
+    outof_I = scalar_vector(-1, outof_I);
+    a.x += outof_J.x * diff / 100;
+    a.y += outof_J.y * diff / 100;
+    b.x += outof_I.x * diff / 100;
+    b.y += outof_I.y * diff / 100;
+};
+
 Space_Stage.prototype.meteors_collision = function() {
     for (var i = 0; i < this.meteors.length; i++)
     {
@@ -113,22 +138,9 @@ Space_Stage.prototype.meteors_collision = function() {
         {
             if(this.circle_circle_collision(this.meteors[i], this.meteors[j]))
             {
-                // [2 * (dot(A>, N>) * N> - A>)].........|      A>          |...
-                var r1_r2 = Math.pow(this.meteors[i].radius + this.meteors[j].radius, 2);
-                var i_j = Math.pow(this.meteors[i].x - this.meteors[j].x, 2)
-                    + Math.pow(this.meteors[i].y - this.meteors[j].y, 2);
-                var diff = r1_r2 - i_j;
-                var outof_J = v1_minus_v2(this.meteors[j], this.meteors[i]);
-                var outof_I = v1_minus_v2(this.meteors[i], this.meteors[j]);
-                outof_J = scalar_vector(-1, outof_J);
-                outof_I = scalar_vector(-1, outof_I);
-                this.meteors[i].x += outof_J.x * diff / 1000;
-                this.meteors[i].y += outof_J.y * diff / 1000;
-                this.meteors[j].x += outof_I.x * diff / 1000;
-                this.meteors[j].y += outof_I.y * diff / 1000;
-                var temp = this.meteors[i].dir;
-                this.meteors[i].dir = this.meteors[j].dir;
-                this.meteors[j].dir = temp;
+                this.normalize_position(this.meteors[i], this.meteors[j]);
+                this.meteors[i].dir = normalize(vector_reflection(this.meteors[i], this.meteors[j]));
+                this.meteors[j].dir = normalize(vector_reflection(this.meteors[j], this.meteors[i]));
             }
         }
     }
@@ -144,6 +156,7 @@ Space_Stage.prototype.bullets_collision = function (){
                 this.meteors[i].asteroid.height /= 2;
                 this.meteors[i].redraw();
                 if (this.meteors[i].radius < 10) {
+                    this.fps += 1;
                     this.removeChild(this.meteors[i]);
                     this.meteors.splice(i, 1);
                     i = i > 0 ? i-- : 0;
@@ -187,6 +200,7 @@ Space_Stage.prototype.game_over = function(){
     this.add_menu();
     this.add_meteors();
     this.score = 0;
+    this.fps = 100;
     for (var i = this.bullets.length; i > 0; i--)
     {
         this.removeChild(this.bullets[i]);
@@ -233,9 +247,9 @@ Space_Stage.prototype.shoot = function(delta){
     }
 };
 
-Space_Stage.prototype.movement = function(){
-        this.player.y += this.player.y_velocity;
-        this.player.x += this.player.x_velocity;
+Space_Stage.prototype.movement = function(delta){
+        this.player.y += this.player.y_velocity * delta;
+        this.player.x += this.player.x_velocity * delta;
         this.player.x_velocity *= 0.9;
         this.player.y_velocity *= 0.9;
 
@@ -244,21 +258,30 @@ Space_Stage.prototype.movement = function(){
 };
 //
 Space_Stage.prototype.events = function () {
-        if (pressed[KeyCod.Up])
-            this.player.y_velocity -= 0.7;
-        if (pressed[KeyCod.Down])
-            this.player.y_velocity += 0.7;
-        if (pressed[KeyCod.Right])
-            this.player.x_velocity += 0.7;
-        if (pressed[KeyCod.Left])
-            this.player.x_velocity -= 0.7;
-        if (pressed[KeyCod.Space])
+    if (pressed[KeyCod.Up])
+        this.player.y_velocity -= 0.7;
+    if (pressed[KeyCod.Down])
+        this.player.y_velocity += 0.7;
+    if (pressed[KeyCod.Right])
+        this.player.x_velocity += 0.7;
+    if (pressed[KeyCod.Left])
+        this.player.x_velocity -= 0.7;
+    if (pressed[KeyCod.Space])
+    {
+        // pressed[KeyCod.Space] = false;
+        // console.log(this.player.x, this.player.y);
+        var dir = {x : this.mouse_loc.x, y : this.mouse_loc.y};
+        dir = normalize(dir);
+        if (this.fps > 1)
         {
-            // pressed[KeyCod.Space] = false;
-            // console.log(this.player.x, this.player.y);
-            var dir = {x : app.renderer.plugins.interaction.mouse.global.x - 300, y : app.renderer.plugins.interaction.mouse.global.y - 300}
             this.create_bullets(dir);
+            this.fps--;
         }
+    }
+    if (!pressed[KeyCod.Space])
+    {
+        this.fps += 0.25;
+    }
 };
 
 Space_Stage.prototype.rotate_to_point = function(mx, my, px, py){
@@ -273,18 +296,15 @@ Space_Stage.prototype.tick = function (delta) {
     // console.log(delta);
     if (this.meteors.length < this.meteors_col)
          this.add_meteors();
+    this.menu.ammo.text = Math.floor(this.fps.toString());
     this.richText.text = this.score.toString();
     // this.player.rotation = this.rotate_to_point(app.renderer.plugins.interaction.mouse.global.x, app.renderer.plugins.interaction.mouse.global.y, this.player.x, this.player.y);
     this.meteors_collision();
     this.bullets_collision();
     this.player_collision();
     this.events();
-    this.movement();
+    this.movement(delta);
     this.shoot(delta);
-
-    // let message = new Text(this.player.mousemove.x);
-    // app.stage.addChild(message);
-    // message.position.set(54, 96);
 };
 
 window.addEventListener("keydown", function (event) {

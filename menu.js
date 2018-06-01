@@ -5,11 +5,36 @@ function Menu() {
     PIXI.Container.call(this);
 
     this.reload_texture = null;
+    this.ammo = null;
+    this.add_ammo();
     this.add_reload_button();
     this.reload_texture.on('pointerdown', this.click);
 }
 
 Menu.prototype = Object.create(PIXI.Container.prototype);
+
+Menu.prototype.add_ammo = function() {
+    this.text_style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 26,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#ff3e00', '#f127ff'], // gradient
+        stroke: '#f9ff00',
+        strokeThickness: 5,
+        dropShadow: false,
+        dropShadowColor: '#ffac94',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 6,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 440
+    });
+    this.ammo = new PIXI.Text('999', this.text_style);
+    this.ammo.x = 300;
+    this.ammo.y = -300;
+    this.addChild(this.ammo);
+};
 
 Menu.prototype.add_reload_button = function () {
     var reload_texture = new PIXI.Sprite.fromImage('https://i.imgur.com/XEk014z.png');

@@ -13,4 +13,4 @@ stage.position.set(300, 300);
 
 app.ticker.add(stage.tick.bind(stage));
 
-
+app.ticker.speed = 1;
