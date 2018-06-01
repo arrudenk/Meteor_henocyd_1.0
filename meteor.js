@@ -6,7 +6,7 @@ function Meteor() {
     this.meteor = null;
     this.radius = Math.random() * (40 - 20 + 1) + 20;
     this.dir = {x : 0, y : 0};
-    this.speed = 4;
+    this.speed = 3;
     this.add_meteor();
     this.asteroid =  new PIXI.Sprite.fromImage('https://i.imgur.com/lJeRD0x.png');
     // this.test.radius = 30;
@@ -48,11 +48,13 @@ Meteor.prototype.move = function (delta) {
 Meteor.prototype.collision = function () {
     if (this.y < -400 || this.y > 400) {
         this.y = Math.min(400, Math.max(-400, this.y));// check+++++
-        this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
+        // this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
+        this.dir.y *= -1;
     }
     if (this.x < -400 || this.x > 400) {
         this.x = Math.min(400, Math.max(-400, this.x));// check+++++
-        this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
+        // this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
+        this.dir.x *= -1;
     }
 };
 

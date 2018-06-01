@@ -6,12 +6,24 @@ function Menu() {
 
     this.reload_texture = null;
     this.ammo = null;
+    this.init = null;
+    this.add_init();
     this.add_ammo();
     this.add_reload_button();
     this.reload_texture.on('pointerdown', this.click);
 }
 
 Menu.prototype = Object.create(PIXI.Container.prototype);
+
+Menu.prototype.add_init = function(){
+      this.init = new PIXI.Sprite.fromImage('https://i.imgur.com/YU7yjcW.png');
+      this.init.anchor.set(0.5, 0.5);
+      this.init.width = 600;
+      this.init.height = 600;
+      this.init.x = 0;
+      this.init.y = 0;
+      this.addChild(this.init);
+};
 
 Menu.prototype.add_ammo = function() {
     this.text_style = new PIXI.TextStyle({
