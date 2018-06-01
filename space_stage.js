@@ -256,7 +256,7 @@ Space_Stage.prototype.game_over = function(){
 	this.add_meteors();
 	this.menu.init.visible = false;
 	this.score = 0;
-	this.fps = 10000;
+	this.fps = 50;
 	for (var i = this.bullets.length; i > 0; i--)
 	{
 		this.removeChild(this.bullets[i]);
