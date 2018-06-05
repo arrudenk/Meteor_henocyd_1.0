@@ -262,6 +262,7 @@ Space_Stage.prototype.game_over = function(){
 		this.removeChild(this.bullets[i]);
 		this.bullets.splice(i, 1);
 	}
+	this.game_start = true;
 	app.ticker.start();
 };
 
