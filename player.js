@@ -34,7 +34,6 @@ Player.prototype.add_player = function () {
 
 Player.prototype.bullet_shoot = function (e) {
     var loc = e.data.getLocalPosition(this);
-    console.log(loc);
     this.emit("bullets_create", loc);
     this.emit("mouse loc", loc);
 };
