@@ -1,7 +1,7 @@
 //Kernel Class
 
 var DEFAULT_AMMO_COUNT = 5;
-var DEFAULT_METEORS_COUNT = 5;
+var DEFAULT_METEORS_COUNT = 10;
 var WIDTH = 600;
 var HEIGHT = 600;
 var SCREEN_CENTER = {x : 0, y: 0};
