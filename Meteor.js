@@ -28,7 +28,7 @@ Meteor.prototype.addMeteor = function() {
   var normal = Math.sqrt(this.dir.x * this.dir.x + this.dir.y * this.dir.y);
   this.dir.x = this.dir.x / normal;
   this.dir.y = this.dir.y / normal;
-  this.visible = false;
+  this.graphics.visible = false;
   this.addChild(this.graphics);
   // this.addChild(sprite);
 };
