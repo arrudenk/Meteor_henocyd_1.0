@@ -25,7 +25,7 @@ function SpaceStage() {
     this.game_start = false;
 
     this.meteors = [];
-    this.meteors_col = 5;
+    this.meteors_col = 10;
     this.bullets = [];
     this.bulletspeed = 20;
     this.player = null;
@@ -260,7 +260,7 @@ SpaceStage.prototype.gameOver = function(){
     this.addMenu();
 	this.menu.init.visible = false;
 	this.score = 0;
-	this.meteors_col = 5;
+	this.meteors_col = 10;
 	this.ammo = 5;
 	for (var i = this.bullets.length; i > 0; i--)
 	{
