@@ -247,7 +247,7 @@ SpaceStage.prototype.tick = function (delta) {
         this.ammo--;
     }
     this.menu.ammo.text = "METEORS: " + this.meteors_col;
-	this.background.rotation += delta;
+	this.background.rotation += delta / 100;
    	this.bulletsWallCollision();
 };
 
