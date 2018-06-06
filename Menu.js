@@ -12,8 +12,7 @@ function Menu() {
     this.addInit();
     this.addAmmo();
     this.addReloadButton();
-    this.interactive = true;
-    this.on('pointerdown', this.click, this);
+    this.reloadButton.on('pointerdown', this.click, this);
 }
 
 Menu.prototype = Object.create(PIXI.Container.prototype);

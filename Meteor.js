@@ -69,5 +69,6 @@ Meteor.prototype.ishit = function () {
 Meteor.prototype.tick = function (delta) {
     this.move(delta);
     this.checkWallCollision();
+    this.rotation += delta;
     // console.log(this.dir);
 };

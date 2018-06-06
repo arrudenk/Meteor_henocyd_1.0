@@ -1,68 +1,64 @@
 //Kernel Class
-var SpaceStage = (function(){
-
-
-    return SpaceStage;
-})();
-var pressed = {};
-
-var KeyCode = {
-    Up : 87,
-    Down : 83,
-    Left : 65,
-    Right : 68,
-    Space : 32,
-    Enter : 13
-};
 
 var DEFAULT_AMMO_COUNT = 5;
+var DEFAULT_METEORS_COUNT = 5;
+var WIDTH = 600;
+var HEIGHT = 600;
+var SCREEN_CENTER = {x : 0, y: 0};
+
 
 function SpaceStage() {
     PIXI.Container.call(this);
 
-    this.ammo = 20;
-    this.mouse_loc = {};
+    this.ammo = DEFAULT_AMMO_COUNT;
+    this.mouseLoc = {};
     this.game_start = false;
-
     this.meteors = [];
-    this.meteors_col = 10;
+    this.meteors_col = DEFAULT_METEORS_COUNT;
     this.bullets = [];
-    this.bulletspeed = 20;
     this.player = null;
     this.menu = null;
-    this.background =  new PIXI.Sprite.fromImage('https://i.imgur.com/m0dV5B9.png');
-    this.background.anchor.set(0.5, 0.5);
-    this.addChild(this.background);
-
+	this.score = 0;
+    this.addBackground();
     this.addPlayer();
-    this.addMenu();
-    this.addMeteors();
-    this.score = 0;
-    this.text_style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 36,
-        fontStyle: 'italic',
-        fontWeight: 'bold',
-        fill: ['#ff81dc', '#1323ff'], // gradient
-        stroke: '#4a1850',
-        strokeThickness: 5,
-        dropShadow: true,
-        dropShadowColor: '#000000',
-        dropShadowBlur: 4,
-        dropShadowAngle: Math.PI / 6,
-        dropShadowDistance: 6,
-        wordWrap: true,
-        wordWrapWidth: 440
-    });
-    this.richText = new PIXI.Text("SCORE: ", this.text_style);
-    this.richText.x = -300;
-    this.richText.y = -300;
-    this.addChild(this.richText);
+	this.addMenu();
+	this.addMeteors();
+    this.addScoreText();
     console.log(app);
     console.log(this);
 }
 
 SpaceStage.prototype = Object.create(PIXI.Container.prototype);
+
+SpaceStage.prototype.addScoreText = function(){
+	this.scoreTextStyle = new PIXI.TextStyle({
+		fontFamily: 'Arial',
+		fontSize: 36,
+		fontStyle: 'italic',
+		fontWeight: 'bold',
+		fill: ['#ff81dc', '#1323ff'], // gradient
+		stroke: '#4a1850',
+		strokeThickness: 5,
+		dropShadow: true,
+		dropShadowColor: '#000000',
+		dropShadowBlur: 4,
+		dropShadowAngle: Math.PI / 6,
+		dropShadowDistance: 6,
+		wordWrap: true,
+		wordWrapWidth: 440
+	});
+	this.scoreText = new PIXI.Text("SCORE: ", this.scoreTextStyle);
+	this.scoreText.x = SCREEN_CENTER.x - HEIGHT / 2;
+	this.scoreText.y = SCREEN_CENTER.y - WIDTH / 2;
+	this.addChild(this.scoreText);
+};
+
+SpaceStage.prototype.addBackground = function(){
+	this.background =  new PIXI.Sprite.fromImage('https://i.imgur.com/m0dV5B9.png');
+	this.background.anchor.set(0.5, 0.5);
+	this.background.scale.set(1.5, 1.5);
+	this.addChild(this.background);
+};
 
 SpaceStage.prototype.addMenu = function(){
     this.menu = new Menu();
@@ -81,16 +77,18 @@ SpaceStage.prototype.addPlayer = function(){
     this.player.on("click", this.shoot, this);
 };
 
-SpaceStage.prototype.playerCollision = function ()
+SpaceStage.prototype.addMeteors = function (position) {
+	var meteor = new Meteor();
+	if (position === undefined)
+		meteor.position.set(Math.random() * (-400 - HEIGHT) + HEIGHT, Math.random() * (-400 - -300) + -300);
+	else
+		meteor.position.set(position.x, position.y);
+	this.meteors.push(meteor);
+	this.addChild(meteor);
+};
+
+SpaceStage.prototype.playerMeteorCollision = function ()
 {
-	if (this.player.y < -300 || this.player.y > 300) {
-		this.player.y = Math.min(300, Math.max(-300, this.player.y));
-		this.player.y *= -1;
-	}
-	if (this.player.x < -300 || this.player.x > 300) {
-		this.player.x = Math.min(300, Math.max(-300, this.player.x));
-		this.player.x *= -1;
-	}
 	for (var i = 0; i < this.meteors.length; i++){
 		if(circleCircleCollision(this.meteors[i], this.player))
 		{
@@ -100,23 +98,6 @@ SpaceStage.prototype.playerCollision = function ()
 			this.menu.init.visible = true;
 		}
 	}
-};
-
-SpaceStage.prototype.playerMovement = function(delta){
-	this.player.y += this.player.y_velocity * delta;
-	this.player.x += this.player.x_velocity * delta;
-	this.player.x_velocity *= 0.9;
-	this.player.y_velocity *= 0.9;
-};
-
-SpaceStage.prototype.addMeteors = function () {
-    for (var i = 0; i < 1; i++)
-    {
-        var meteor = new Meteor();
-        meteor.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
-        this.meteors.push(meteor);
-        this.addChild(meteor);
-    }
 };
 
 SpaceStage.prototype.meteorOutOfMeteor = function(a, b)
@@ -150,35 +131,33 @@ SpaceStage.prototype.meteorsCollision = function() {
     }
 };
 
-SpaceStage.prototype.meteorsMovement = function(delta)
+SpaceStage.prototype.meteorsTick = function(delta)
 {
 	for (var i = 0; i < this.meteors.length; i++) {
 		this.meteors[i].tick(delta);
 	}
 };
 
-SpaceStage.prototype.bulletsCreate = function(loc){
-	var bullet =  new PIXI.Graphics();
-	bullet.radius = 3;
-	bullet.beginFill(0xff0000)
-		.drawCircle(0, 0, bullet.radius)
-		.endFill();
-	var normal  = Math.sqrt(loc.x * loc.x + loc.y * loc.y);
-	bullet.dir = {
-		x : loc.x / normal,
-		y : loc.y / normal
-	};
+SpaceStage.prototype.bulletsCreate = function(){
+	var bullet =  new Bullet();
+	bullet.setupPosition(this.player);
+	bullet.setupDirection(this.mouseLoc);
 	this.addChild(bullet);
-	bullet.x = (this.player.x);
-	bullet.y = (this.player.y) - 20;
 	this.bullets.push(bullet);
 };
 
-SpaceStage.prototype.bulletShoot = function(delta){
+SpaceStage.prototype.bulletTick = function(delta)
+{
 	for (var i = 0; i < this.bullets.length; i++) {
-		this.bullets[i].y += this.bullets[i].dir.y * delta * this.bulletspeed;
-		this.bullets[i].x += this.bullets[i].dir.x * delta * this.bulletspeed;
-		if (Math.abs(this.bullets[i].x) > 600 || Math.abs(this.bullets[i].y) > 600)
+		this.bullets[i].tick(delta);
+	}
+};
+
+
+SpaceStage.prototype.bulletsWallCollision = function(){
+	// Bullet-Wall collision
+	for (var i = 0; i < this.bullets.length; i++) {
+		if (Math.abs(this.bullets[i].x) > HEIGHT || Math.abs(this.bullets[i].y) > WIDTH)
 		{
 			this.removeChild(this.bullets[i]);
 			this.bullets.splice(i,1);
@@ -187,7 +166,7 @@ SpaceStage.prototype.bulletShoot = function(delta){
 	}
 };
 
-SpaceStage.prototype.bulletsCollision = function (){
+SpaceStage.prototype.bulletsMeteorCollision = function (){
     for (var i = 0; i < this.meteors.length; i++) {
         for (var k = 0; k < this.bullets.length; k++) {
             if (circleCircleCollision(this.meteors[i], this.bullets[k])) {
@@ -220,29 +199,7 @@ SpaceStage.prototype.shoot = function(loc){
 };
 
 SpaceStage.prototype.mouse = function(loc){
-	this.mouse_loc = loc;
-};
-
-SpaceStage.prototype.keypadEvents = function () {
-    if (pressed[KeyCode.Up])
-        this.player.y_velocity -= 0.7;
-    if (pressed[KeyCode.Down])
-        this.player.y_velocity += 0.7;
-    if (pressed[KeyCode.Right])
-        this.player.x_velocity += 0.7;
-    if (pressed[KeyCode.Left])
-        this.player.x_velocity -= 0.7;
-    if (pressed[KeyCode.Enter])
-    {
-        this.game_start = true;
-        this.menu.init.visible = false;
-        this.gameOver();
-    }
-    if (pressed[KeyCode.Space])
-    {
-        this.ammo = 5;
-        pressed[KeyCode.Space] = false;
-    }
+	this.mouseLoc = loc;
 };
 
 SpaceStage.prototype.gameOver = function(){
@@ -260,7 +217,7 @@ SpaceStage.prototype.gameOver = function(){
     this.addMenu();
 	this.menu.init.visible = false;
 	this.score = 0;
-	this.meteors_col = 10;
+	this.meteors_col = 5;
 	this.ammo = 5;
 	for (var i = this.bullets.length; i > 0; i--)
 	{
@@ -272,32 +229,25 @@ SpaceStage.prototype.gameOver = function(){
 };
 
 SpaceStage.prototype.tick = function (delta) {
+    this.player.tick(delta);
+    this.meteorsTick(delta);
+    this.bulletTick(delta);
+	this.meteorsCollision();
     if (this.game_start) {
         if (this.meteors.length < this.meteors_col)
             this.addMeteors();
-        this.richText.text = "SCORE: " + this.score;
-        this.meteorsMovement(delta);
-        this.meteorsCollision();
-        this.bulletsCollision();
+        this.scoreText.text = "SCORE: " + this.score;
+
+        this.bulletsMeteorCollision();
     }
-    this.playerCollision();
-    var dir = {x : this.mouse_loc.x, y : this.mouse_loc.y};
-    dir = normalize(dir);
+    this.playerMeteorCollision();
     if (this.ammo > 1)
     {
-        this.bulletsCreate(dir);
+        this.bulletsCreate();
         this.ammo--;
     }
     this.menu.ammo.text = "METEORS: " + this.meteors_col;
-    this.playerMovement(delta);
-    this.bulletShoot(delta);
-    this.keypadEvents();
+	this.background.rotation += delta;
+   	this.bulletsWallCollision();
 };
 
-window.addEventListener("keydown", function (event) {
-    pressed[event.keyCode] = true;
-});
-
-window.addEventListener("keyup", function (event) {
-    delete pressed[event.keyCode];
-});
