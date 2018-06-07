@@ -5,7 +5,7 @@ function Bullet() {
     PIXI.Container.call(this);
     this.graphics = null;
     this.radius = null;
-    this.speed = 20;
+    this.speed = 40;
     this.dir = {x : 0, y : 0};
     this.addGraphics();
 }

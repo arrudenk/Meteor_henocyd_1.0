@@ -54,13 +54,13 @@ Player.prototype.mousePosition = function (e) {
 };
 
 Player.prototype.playerWallCollision = function () {
-    if (this.player.y < -300 || this.player.y > 300) {
-        this.player.y = Math.min(300, Math.max(-300, this.player.y));
-        this.player.y *= -1;
+    if (this.y < -300 || this.y > 300) {
+        this.y = Math.min(300, Math.max(-300, this.y));
+        this.y *= -1;
     }
-    if (this.player.x < -300 || this.player.x > 300) {
-        this.player.x = Math.min(300, Math.max(-300, this.player.x));
-        this.player.x *= -1;
+    if (this.x < -300 || this.x > 300) {
+        this.x = Math.min(300, Math.max(-300, this.x));
+        this.x *= -1;
     }
 };
 

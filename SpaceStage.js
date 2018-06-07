@@ -1,11 +1,10 @@
 //Kernel Class
 
 var DEFAULT_AMMO_COUNT = 5;
-var DEFAULT_METEORS_COUNT = 10;
+var DEFAULT_METEORS_COUNT = 15;
 var WIDTH = 600;
 var HEIGHT = 600;
 var SCREEN_CENTER = {x : 0, y: 0};
-
 
 function SpaceStage() {
     PIXI.Container.call(this);
@@ -24,6 +23,7 @@ function SpaceStage() {
 	this.addMenu();
 	this.addMeteors();
     this.addScoreText();
+    this.explosionTextures = [];
     console.log(app);
     console.log(this);
 }
@@ -54,9 +54,9 @@ SpaceStage.prototype.addScoreText = function(){
 };
 
 SpaceStage.prototype.addBackground = function(){
-	this.background =  new PIXI.Sprite.fromImage('https://i.imgur.com/m0dV5B9.png');
+	this.background =  new PIXI.Sprite.fromImage('https://i.imgur.com/aVKXTmP.png');
 	this.background.anchor.set(0.5, 0.5);
-	this.background.scale.set(1.5, 1.5);
+	// this.background.scale.set(1.5, 1.5);
 	this.addChild(this.background);
 };
 
@@ -73,7 +73,7 @@ SpaceStage.prototype.addPlayer = function(){
     this.player = new Player();
     this.addChild(this.player);
     // this.player.on("bullets_create", this.bullets_create, this)
-    this.player.on("mouse loc", this.mouse, this);
+    this.player.on("mouse loc", this.getMousePosition, this);
     this.player.on("click", this.shoot, this);
 };
 
@@ -106,14 +106,14 @@ SpaceStage.prototype.meteorOutOfMeteor = function(a, b)
     var i_j = Math.pow(a.x - b.x, 2)
         + Math.pow(a.y - b.y, 2);
     var diff = r1_r2 - i_j;
-    var outof_J = v1Minusv2(b, a);
-    var outof_I = v1Minusv2(a, b);
+    var outof_J = (v1Minusv2(b, a));
+    var outof_I = (v1Minusv2(a, b));
     outof_J = scalarVector(-1, outof_J);
     outof_I = scalarVector(-1, outof_I);
-    a.x += outof_J.x * diff / 1000;
-    a.y += outof_J.y * diff / 1000;
-    b.x += outof_I.x * diff / 1000;
-    b.y += outof_I.y * diff / 1000;
+    a.x += outof_J.x * diff / 800;
+    a.y += outof_J.y * diff / 800;
+    b.x += outof_I.x * diff / 800;
+    b.y += outof_I.y * diff / 800;
 };
 
 SpaceStage.prototype.meteorsCollision = function() {
@@ -123,9 +123,10 @@ SpaceStage.prototype.meteorsCollision = function() {
         {
             if(circleCircleCollision(this.meteors[i], this.meteors[j]))
             {
-                this.meteorOutOfMeteor(this.meteors[i], this.meteors[j]);
+
                 this.meteors[i].dir = normalize(vectorReflection(this.meteors[i], this.meteors[j]));
                 this.meteors[j].dir = normalize(vectorReflection(this.meteors[j], this.meteors[i]));
+				this.meteorOutOfMeteor(this.meteors[i], this.meteors[j]);
             }
         }
     }
@@ -174,12 +175,14 @@ SpaceStage.prototype.bulletsMeteorCollision = function (){
                 this.meteors[i].spriteImage.width /= 2;
                 this.meteors[i].spriteImage.height /= 2;
                 this.meteors[i].redraw();
+				this.destructAnimation(this.meteors[i], 0.5);
                 if (this.meteors[i].radius < 10) {
                     if ((this.score % 10 === 0) && this.score > 1) {
                         console.log(this.score % 10);
                         this.meteors_col += 2;
                     }
                     this.score++;
+                    this.destructAnimation(this.meteors[i], 0.250);
                     this.removeChild(this.meteors[i]);
                     this.meteors.splice(i, 1);
                     i = i > 0 ? i-- : 0;
@@ -198,8 +201,35 @@ SpaceStage.prototype.shoot = function(loc){
     this.ammo = 5;
 };
 
-SpaceStage.prototype.mouse = function(loc){
+SpaceStage.prototype.getMousePosition = function(loc){
 	this.mouseLoc = loc;
+};
+
+SpaceStage.prototype.addExplosionTexture = function(){
+	// create an array and store the textures --->
+	var explosionTextures = [];
+	for (var i = 0; i < 26; i++) {
+		var texture = PIXI.Texture.fromFrame('Explosion_Sequence_A ' + (i + 1) + '.png');
+		explosionTextures.push(texture);
+	}
+	this.explosionTextures = explosionTextures;
+	//  <----
+};
+
+SpaceStage.prototype.destructAnimation = function(loc, scale){
+	this.addExplosionTexture();
+	var explosion = new PIXI.extras.AnimatedSprite(this.explosionTextures);
+	explosion.x = loc.x;
+	explosion.y = loc.y;
+	explosion.anchor.set(0.5);
+	explosion.scale.set(scale);
+	explosion.loop = false;
+	explosion.animationSpeed = 0.50;
+	this.addChild(explosion);
+	explosion.play();
+	explosion.onComplete = () => {
+		explosion.destroy();
+	};
 };
 
 SpaceStage.prototype.gameOver = function(){
@@ -213,12 +243,12 @@ SpaceStage.prototype.gameOver = function(){
 	this.removeChild(this.player);
 	this.removeChild(this.menu);
 	this.addPlayer();
+	this.addMenu();
     this.addMeteors();
-    this.addMenu();
 	this.menu.init.visible = false;
 	this.score = 0;
-	this.meteors_col = 5;
-	this.ammo = 5;
+	this.meteors_col = DEFAULT_METEORS_COUNT;
+	this.ammo = DEFAULT_AMMO_COUNT;
 	for (var i = this.bullets.length; i > 0; i--)
 	{
 		this.removeChild(this.bullets[i]);
@@ -239,15 +269,14 @@ SpaceStage.prototype.tick = function (delta) {
         this.scoreText.text = "SCORE: " + this.score;
 
         this.bulletsMeteorCollision();
+		this.playerMeteorCollision();
     }
-    this.playerMeteorCollision();
     if (this.ammo > 1)
     {
         this.bulletsCreate();
         this.ammo--;
     }
     this.menu.ammo.text = "METEORS: " + this.meteors_col;
-	this.background.rotation += delta / 100;
    	this.bulletsWallCollision();
 };
 
