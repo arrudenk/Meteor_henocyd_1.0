@@ -1,7 +1,7 @@
 // header.h
 
 
-var DEFAULT_AMMO_COUNT = 3;
+var DEFAULT_AMMO_COUNT = 2;
 var DEFAULT_METEORS_COUNT = 15;
 var WIDTH = 600;
 var HEIGHT = 600;

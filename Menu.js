@@ -57,6 +57,5 @@ Menu.prototype.addReloadButton = function () {
 };
 
 Menu.prototype.click = function (e) {
-    console.log('hello');
     this.emit('reload game');
 };

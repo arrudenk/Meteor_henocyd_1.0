@@ -7,7 +7,7 @@ function SpaceStage() {
 
     this.ammo = DEFAULT_AMMO_COUNT;
     this.mouseLoc = {};
-    this.hit = {};
+    this.level = 30;
     this.game_start = false;
     this.meteors = [];
     this.meteors_col = DEFAULT_METEORS_COUNT;
@@ -118,7 +118,9 @@ SpaceStage.prototype.playerMeteorCollision = function ()
 		if(circleCircleCollision(this.meteors[i], this.player))
 		{
 			this.destructAnimation(this.player, 3);
-			window.alert("SCORE: " + this.score);
+			this.player.texture.visible = false;
+			this.destroyAllMeteors();
+			console.log("SCORE " + this.score);
 			// this.destructAnimation(this.player, 3);
 			// this.destructAnimation(this.player, 3);
 
@@ -200,7 +202,6 @@ SpaceStage.prototype.bulletsMeteorCollision = function (){
 				this.destructAnimation(this.meteors[i], 0.5);
                 if (this.meteors[i].radius < 10) {
                     if ((this.score % 10 === 0) && this.score > 1) {
-                        console.log(this.score % 10);
                         this.meteors_col += 2;
                     }
                     this.score++;
@@ -221,6 +222,11 @@ SpaceStage.prototype.bulletsMeteorCollision = function (){
 
 SpaceStage.prototype.shoot = function(loc){
     this.ammo = DEFAULT_AMMO_COUNT;
+	if (this.ammo > 1)
+	{
+		this.bulletsCreate();
+		this.ammo--;
+	}
 };
 
 SpaceStage.prototype.getMousePosition = function(loc){
@@ -267,7 +273,6 @@ SpaceStage.prototype.destroyAllMeteors = function(){
 };
 
 SpaceStage.prototype.gameOver = function(){
-    console.log("hello2");
 	app.ticker.stop();
 	this.destroyAllMeteors();
 	this.removeChild(this.player);
@@ -280,6 +285,7 @@ SpaceStage.prototype.gameOver = function(){
 	this.score = 0;
 	this.meteors_col = DEFAULT_METEORS_COUNT;
 	this.ammo = DEFAULT_AMMO_COUNT;
+	this.level = 30;
 	for (var i = this.bullets.length; i > 0; i--)
 	{
 		this.removeChild(this.bullets[i]);
@@ -300,13 +306,10 @@ SpaceStage.prototype.tick = function (delta) {
 	this.meteorsCollision();
 	this.bulletsMeteorCollision();
 	this.playerMeteorCollision();
-    if (this.ammo > 1)
-    {
-        this.bulletsCreate();
-        this.ammo--;
-    }
-    if (this.meteors.length === 40)
+
+    if (this.meteors.length === this.level)
 	{
+		this.level += 10;
 		this.destroyAllMeteors();
 		this.meteors_col = 10;
 	}
