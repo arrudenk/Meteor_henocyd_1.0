@@ -18,7 +18,7 @@ function Menu() {
 Menu.prototype = Object.create(PIXI.Container.prototype);
 
 Menu.prototype.addInit = function(){
-      this.init = new PIXI.Sprite.fromImage('https://i.imgur.com/BXelQO4.png');
+      this.init = new PIXI.Sprite.fromImage('https://i.imgur.com/WwUvBbJ.png');
       this.init.anchor.set(0.5, 0.5);
       this.addChild(this.init);
 };
@@ -51,12 +51,11 @@ Menu.prototype.addReloadButton = function () {
     this.reloadButton.anchor.set(0.5, 0.5);
     this.reloadButton.width = 30;
     this.reloadButton.height = 30;
-    this.reloadButton.x = 275;
-    this.reloadButton.y = -275;
     this.reloadButton.interactive = true;
     this.reloadButton.buttonMode = true;
     this.addChild(this.reloadButton);
 };
+
 Menu.prototype.click = function (e) {
     console.log('hello');
     this.emit('reload game');

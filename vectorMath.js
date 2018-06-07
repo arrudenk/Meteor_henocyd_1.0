@@ -45,11 +45,11 @@ function vectorReflection(vec_A, vec_B) {
     //__________|>N> = Vec_B - Vec_A      |4
     var normal = v1Minusv2(vec_B, vec_A);
     //_________DOT[A>;N>]                   |3
-    var dot = dotProduct(vec_A.dir, normal);
+    var dot = dotProduct(vec_A.direction, normal);
     //___________(2 * DOT[A>;N>]) * N>         |2
     var reflection = scalarVector(2 * dot, normal);
     //___________|_A> - ((2 * DOT[A>;N>]) * N>)    |1
-    reflection = v1Minusv2(vec_A.dir, reflection);
+    reflection = v1Minusv2(vec_A.direction, reflection);
     return (reflection);//                         |DONE
 }
 
