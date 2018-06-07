@@ -59,7 +59,7 @@
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "star.png",
+	"image": "https://i.imgur.com/SKtRLBB.png",
 	"format": "RGBA8888",
 	"size": {"w":702,"h":101},
 	"scale": "1",
