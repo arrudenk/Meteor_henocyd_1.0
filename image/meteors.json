@@ -515,7 +515,7 @@
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "meteors.png",
+	"image": "https://i.imgur.com/ylqYQpd.png",
 	"format": "RGBA8888",
 	"size": {"w":2048,"h":512},
 	"scale": "1",
