@@ -30,16 +30,16 @@ Meteor.prototype.drawDirection = function () {
 
 Meteor.prototype.meteorWallCollision = function () {
 	//check collision with horizontal walls
-	if (this.y < -400 || this.y > 400) {
-		this.y = Math.min(400, Math.max(-400, this.y));// check+++++
-		// this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
-		this.direction.y *= -1;
-	}
-	//check collision with vertical walls
-	if (this.x < -400 || this.x > 400) {
-		this.x = Math.min(400, Math.max(-400, this.x));// check+++++
+	if (this.x < 0 - WIDTH / 2 - 100 || this.x > WIDTH / 2 + 100) {
+		this.x = Math.min(WIDTH / 2, Math.max(0 - WIDTH / 2 - 100, this.x));// check+++++
 		// this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
 		this.direction.x *= -1;
+	}
+	//check collision with vertical walls
+	if (this.y < 0 - HEIGHT / 2 - 100 || this.y > HEIGHT / 2 + 100) {
+		this.y = Math.min(HEIGHT / 2, Math.max(0 - HEIGHT / 2 - 100, this.y));// check+++++
+		// this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
+		this.direction.y *= -1;
 	}
 };
 

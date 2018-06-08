@@ -41,8 +41,8 @@ Menu.prototype.addAmmo = function() {
         wordWrapWidth: 440
     });
     this.ammo = new PIXI.Text('5', this.meteorsNumber);
-    this.ammo.x = 300;
-    this.ammo.y = -300;
+    this.ammo.x = WIDTH/ 2;
+    this.ammo.y = 0 - HEIGHT / 2;
     this.addChild(this.ammo);
 };
 

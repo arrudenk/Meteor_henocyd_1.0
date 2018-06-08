@@ -9,7 +9,8 @@ function Player() {
     this.on("pointerdown", this.bulletShoot, this);
     this.x_velocity = 0;
     this.y_velocity = 0;
-    this.hitArea = new PIXI.Rectangle(-600, -600, 1200, 1200);
+    this.mouseLoc = 0;
+    this.hitArea = new PIXI.Rectangle(0-WIDTH, 0-HEIGHT, WIDTH * 2, HEIGHT * 2);
 }
 
 Player.prototype = Object.create(GameObject.prototype);
@@ -20,9 +21,9 @@ Player.prototype.bulletShoot = function(e) {
 };
 
 Player.prototype.mousePosition = function (e) {
-    var loc = e.data.getLocalPosition(this);
+    this.mouseLoc = e.data.getLocalPosition(this);
     // this.emit("bullets_create", loc);
-    this.emit("mouse loc", loc);
+    this.emit("mouse loc", this.mouseLoc);
 };
 
 Player.prototype.playerMovement = function(delta){
@@ -48,6 +49,8 @@ Player.prototype.keypadEvents = function () {
 Player.prototype.tick = function (delta) {
     this.playerMovement(delta);
     GameObject.prototype.wallCollision.apply(this);
+	this.texture.rotation = findAngle(0,0,this.mouseLoc.x, this.mouseLoc.y);
+
     this.keypadEvents();
 };
 

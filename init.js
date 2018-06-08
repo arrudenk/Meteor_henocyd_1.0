@@ -1,7 +1,7 @@
 
 
 
-var app = new PIXI.Application({width: 600, height:600});
+var app = new PIXI.Application({width: WIDTH, height:HEIGHT});
 
 document.body.appendChild(app.view);
 
@@ -13,6 +13,6 @@ var stage = new SpaceStage();
 
 app.stage.addChild(stage);
 
-stage.position.set(300, 300);
+stage.position.set(WIDTH / 2, HEIGHT /2);
 
 app.ticker.add(stage.tick.bind(stage));

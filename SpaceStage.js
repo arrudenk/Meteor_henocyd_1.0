@@ -4,6 +4,7 @@
 
 function SpaceStage() {
     PIXI.Container.call(this);
+    this.time = 0;
 
     this.ammo = DEFAULT_AMMO_COUNT;
     this.mouseLoc = {};
@@ -21,6 +22,7 @@ function SpaceStage() {
 	this.addMeteors();
     this.addScoreText();
     this.explosionTextures = [];
+	this.bulletPossitionSide = 40;
     console.log(app);
     console.log(this);
 }
@@ -45,21 +47,23 @@ SpaceStage.prototype.addScoreText = function(){
 		wordWrapWidth: 440
 	});
 	this.scoreText = new PIXI.Text("SCORE: ", this.scoreTextStyle);
-	this.scoreText.x = SCREEN_CENTER.x - HEIGHT / 2;
-	this.scoreText.y = SCREEN_CENTER.y - WIDTH / 2;
+	this.scoreText.y = SCREEN_CENTER.x - HEIGHT / 2;
+	this.scoreText.x = SCREEN_CENTER.y - WIDTH / 2;
 	this.addChild(this.scoreText);
 };
 
 SpaceStage.prototype.addBackground = function(){
 	this.background =  new PIXI.Sprite.fromImage(BACKGROUND_TEXTURE_URL);
 	this.background.anchor.set(0.5, 0.5);
+	this.background.height = HEIGHT;
+	this.background.width = WIDTH;
 	// this.background.scale.set(1.5, 1.5);
 	this.addChild(this.background);
 };
 
 SpaceStage.prototype.addMenu = function(){
     this.menu = new Menu();
-    this.menu.ammo.position.set(-300, 250);
+    this.menu.ammo.position.set(0 - WIDTH / 2, HEIGHT / 2 - 50);
     this.menu.init.position.set(0,0);
 
     this.addChild(this.menu);
@@ -70,14 +74,15 @@ SpaceStage.prototype.addMenu = function(){
 };
 
 SpaceStage.prototype.addPlayer = function(){
-    this.player = new Player("circle", 20, 0, 0, PLAYER_TEXTURE_URL,"random", 0);
-    this.player.texture.width +=20;
-    this.player.texture.height +=20;
+    this.player = new Player("circle", 30, 0, 0, PLAYER_TEXTURE_URL,"random", 0);
+    this.player.texture.width +=10;
+    this.player.texture.height +=10;
     this.player.graphics.visible = false;
     this.addChild(this.player);
     // this.player.on("bullets_create", this.bullets_create, this)
     this.player.on("mouse loc", this.getMousePosition, this);
-	this.player.on("click", this.shoot, this);
+	// this.player.on("mouse loc", this.shoot, this);
+	console.log(this.player);
 };
 
 SpaceStage.prototype.addMeteors = function (position) {
@@ -88,7 +93,8 @@ SpaceStage.prototype.addMeteors = function (position) {
 	};
 	var meteor = new Meteor("circle", random_radius, 0, 0, METEOR_TEXTURE_URL, randomVector, 3);
 	if (position === undefined)
-		meteor.position.set(Math.random() * (0 - HEIGHT / 2 - 100 - HEIGHT) + HEIGHT, Math.random() * (0 - WIDTH / 2 - 100 + WIDTH / 2) - WIDTH / 2);
+		meteor.position.set(Math.random() * (0 - WIDTH / 2 - 100 - WIDTH) + WIDTH
+			, Math.random() * (0 - HEIGHT / 2 - 100 + HEIGHT / 2) - HEIGHT / 2);
 	else
 		meteor.position.set(position.x, position.y);
 	this.meteors.push(meteor);
@@ -101,13 +107,17 @@ SpaceStage.prototype.bulletsCreate = function(){
 	var vector = {x : 0, y: -1};
 	var bullet =  new Bullet(
 		"circle",
-		10,
+		5,
 		0,0,
-		"without_texture",
+		BULLET_TEXTURE_URL,
 		this.mouseLoc,
 		20
 	);
-	bullet.setupPosition(this.player);
+	bullet.graphics.visible = false;
+	this.bulletPossitionSide *= -1;
+	var loc = {x : this.player.x - this.bulletPossitionSide, y : this.player.y - 20}
+	bullet.setupPosition(this.player.x - this.bulletPossitionSide, this.player.y);
+	// this.destructAnimation(loc, 0.1, 2);
 	this.addChild(bullet);
 	this.bullets.push(bullet);
 };
@@ -182,7 +192,7 @@ SpaceStage.prototype.bulletTick = function(delta)
 SpaceStage.prototype.bulletsWallCollision = function(){
 	// Bullet-Wall collision
 	for (var i = 0; i < this.bullets.length; i++) {
-		if (Math.abs(this.bullets[i].x) > HEIGHT || Math.abs(this.bullets[i].y) > WIDTH)
+		if (Math.abs(this.bullets[i].x) > WIDTH || Math.abs(this.bullets[i].y) > HEIGHT)
 		{
 			this.removeChild(this.bullets[i]);
 			this.bullets.splice(i,1);
@@ -220,12 +230,18 @@ SpaceStage.prototype.bulletsMeteorCollision = function (){
 };
 
 
-SpaceStage.prototype.shoot = function(loc){
-    this.ammo = DEFAULT_AMMO_COUNT;
+SpaceStage.prototype.shoot = function(delta){
 	if (this.ammo > 1)
 	{
 		this.bulletsCreate();
 		this.ammo--;
+	}
+	this.time += delta;
+	if (this.time > 10)
+	{
+		console.log("hello");
+		this.ammo = DEFAULT_AMMO_COUNT;
+		this.time = 0;
 	}
 };
 
@@ -244,7 +260,7 @@ SpaceStage.prototype.addExplosionTexture = function(){
 	//  <----
 };
 
-SpaceStage.prototype.destructAnimation = function(loc, scale){
+SpaceStage.prototype.destructAnimation = function(loc, scale, speed){
 	this.addExplosionTexture();
 	var explosion = new PIXI.extras.AnimatedSprite(this.explosionTextures);
 	explosion.x = loc.x;
@@ -252,7 +268,7 @@ SpaceStage.prototype.destructAnimation = function(loc, scale){
 	explosion.anchor.set(0.5);
 	explosion.scale.set(scale);
 	explosion.loop = false;
-	explosion.animationSpeed = 0.50;
+	explosion.animationSpeed = 0.50 || speed;
 	this.addChild(explosion);
 	explosion.play();
 	explosion.onComplete = () => {
@@ -304,6 +320,7 @@ SpaceStage.prototype.gameOver = function(){
 SpaceStage.prototype.tick = function (delta) {
     if (!this.game_start)
     	return (0);
+
 	this.player.tick(delta);
 	this.bulletTick(delta);
 	this.meteorsTick(delta);
@@ -312,7 +329,6 @@ SpaceStage.prototype.tick = function (delta) {
 	this.meteorsCollision();
 	this.bulletsMeteorCollision();
 	this.playerMeteorCollision();
-
     if (this.meteors.length === this.level)
 	{
 		this.level += 10;
@@ -320,8 +336,8 @@ SpaceStage.prototype.tick = function (delta) {
 		this.meteors_col = 10;
 	}
    	this.bulletsWallCollision();
+	this.shoot(delta);
 	this.menu.ammo.text = "METEORS: " + this.meteors_col;
 	this.scoreText.text = "SCORE: " + this.score;
-
 };
 

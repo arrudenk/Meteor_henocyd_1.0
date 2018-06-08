@@ -22,12 +22,12 @@ function GameObject(type, radius, width, height, texture, direction, speed) {
 GameObject.prototype = Object.create(PIXI.Container.prototype);
 
 GameObject.prototype.wallCollision = function(){
-	if (this.y < -300 || this.y > 300) {
-		this.y = Math.min(300, Math.max(-300, this.y));
+	if (this.y < 0 - HEIGHT / 2 || this.y > HEIGHT / 2) {
+		this.y = Math.min(HEIGHT / 2, Math.max(0 - HEIGHT / 2, this.y));
 		this.y *= -1;
 	}
-	if (this.x < -300 || this.x > 300) {
-		this.x = Math.min(300, Math.max(-300, this.x));
+	if (this.x < 0 - WIDTH / 2 || this.x > WIDTH / 2) {
+		this.x = Math.min(WIDTH /2, Math.max(0 - WIDTH / 2, this.x));
 		this.x *= -1;
 	}
 };
@@ -65,8 +65,8 @@ GameObject.prototype.redraw = function(){
 
 GameObject.prototype.addTexture = function () {
 	this.texture.anchor.set(0.5, 0.5);
-	this.texture.height = this.radius * 2;
-	this.texture.width = this.radius * 2;
+	this.texture.height = this.radius * 3;
+	this.texture.width = this.radius * 3;
 	this.texture.visible = true;
 	this.addChild(this.texture);
 };
