@@ -21,7 +21,7 @@ function SpaceStage() {
 	this.addMenu();
 	this.addMeteors();
     this.addScoreText();
-    this.explosionTextures = [];
+    this.explosionTextures = textures.explosionAnimation;
 	this.bulletPossitionSide = 40;
     console.log(app);
     console.log(this);
@@ -209,6 +209,7 @@ SpaceStage.prototype.bulletsMeteorCollision = function (){
                 this.meteors[i].texture.width /= 2;
                 this.meteors[i].texture.height /= 2;
                 this.meteors[i].redraw();
+                this.meteors[i].animationTexture.scale.set(this.meteors[i].animationTexture.scale.x / 2);
 				this.destructAnimation(this.meteors[i], 0.5);
                 if (this.meteors[i].radius < 10) {
                     if ((this.score % 10 === 0) && this.score > 1) {
@@ -249,19 +250,7 @@ SpaceStage.prototype.getMousePosition = function(loc){
 	this.mouseLoc = loc;
 };
 
-SpaceStage.prototype.addExplosionTexture = function(){
-	// create an array and store the textures --->
-	var explosionTextures = [];
-	for (var i = 0; i < 26; i++) {
-		var texture = PIXI.Texture.fromFrame('Explosion_Sequence_A ' + (i + 1) + '.png');
-		explosionTextures.push(texture);
-	}
-	this.explosionTextures = explosionTextures;
-	//  <----
-};
-
 SpaceStage.prototype.destructAnimation = function(loc, scale, speed){
-	this.addExplosionTexture();
 	var explosion = new PIXI.extras.AnimatedSprite(this.explosionTextures);
 	explosion.x = loc.x;
 	explosion.y = loc.y;

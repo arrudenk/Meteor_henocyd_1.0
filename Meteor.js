@@ -7,8 +7,12 @@ function Meteor() {
 	// GameObject.prototype.addDirection.apply(this);
     GameObject.prototype.addGraphics.apply(this);
     GameObject.prototype.addTexture.apply(this);
+    this.animationTextures = textures.meteorAnimation;
+    this.texture.visible = false;
+    this.graphics.visible = false;
 	this.dirLine = null;
     this.drawDirection();
+    this.meteorAnimation();
 }
 
 Meteor.prototype = Object.create(GameObject.prototype);
@@ -41,6 +45,20 @@ Meteor.prototype.meteorWallCollision = function () {
 		// this.position.set(Math.random() * (-400 - 600) + 600, Math.random() * (-400 - -300) + -300);
 		this.direction.y *= -1;
 	}
+};
+
+Meteor.prototype.meteorAnimation = function(){
+	// create an array and store the textures --->
+	//  <----
+	this.animationTexture = new PIXI.extras.AnimatedSprite(this.animationTextures);
+	this.animationTexture.x = this.x;
+	this.animationTexture.y = this.y;
+	this.animationTexture.anchor.set(0.5);
+	this.animationTexture.scale.set(0.70);
+
+	this.animationTexture.animationSpeed = 0.50;
+	this.animationTexture.gotoAndPlay(Math.random() * 64);
+	this.addChild(this.animationTexture);
 };
 
 Meteor.prototype.tick = function (delta) {

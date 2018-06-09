@@ -46,7 +46,7 @@ GameObject.prototype.addDirection = function(direction) {
 GameObject.prototype.addGraphics = function(){
 	this.graphics = new PIXI.Graphics();
 	this.graphics.beginFill(this.color).drawCircle(0, 0, this.radius).endFill();
-	this.graphics.visible = false;
+	this.graphics.visible = true;
 	this.addChild(this.graphics);
 };
 
