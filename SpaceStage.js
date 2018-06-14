@@ -326,7 +326,7 @@ SpaceStage.prototype.tick = function (delta) {
 	}
    	this.bulletsWallCollision();
 	this.shoot(delta);
-	this.menu.ammo.text = "METEORS: " + this.meteors_col;
-	this.scoreText.text = "SCORE: " + this.score;
+	this.menu.ammo.text = "Meteors amount " + this.meteors_col;
+	this.scoreText.text = "Destroyed: " + this.score;
 };
 
