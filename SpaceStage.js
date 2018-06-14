@@ -286,11 +286,12 @@ SpaceStage.prototype.destroyAllGameObjects = function(){
 SpaceStage.prototype.gameOver = function(){
 	app.ticker.stop();
 	this.destroyAllGameObjects();
-	this.removeChild(this.player);
 	this.removeChild(this.menu);
-	this.addPlayer();
+	this.player.texture.visible = true;
+	this.player.x = 0;
+	this.player.y = 0;
 	this.addMenu();
-    this.addMeteors();
+    	this.addMeteors();
 	this.menu.init.visible = false;
 	this.menu.reloadButton.visible = false;
 	this.score = 0;
